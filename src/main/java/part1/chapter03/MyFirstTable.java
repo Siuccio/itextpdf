@@ -7,10 +7,10 @@
 
 package part1.chapter03;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -18,137 +18,94 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
  
 public class MyFirstTable {
  
     /** The resulting PDF file. */
     public static final String RESULT
-        = "C:\\Users\\Administrator\\Desktop\\test.pdf";
- 
-    /** The number of locations on our time table. */
-    public static final int LOCATIONS = 9;
-    /** The number of time slots on our time table. */
-    public static final int TIMESLOTS = 32;
- 
-    /** The offset to the left of our time table. */
-    public static final float OFFSET_LEFT = 76;
-    /** The width of our time table. */
-    public static final float WIDTH = 240;
-    /** The offset from the bottom of our time table. */
-    public static final float OFFSET_BOTTOM = 36;
-    /** The height of our time table */
-    public static final float HEIGHT = 10;
- 
-    /** The offset of the location bar next to our time table. */
-    public static final float OFFSET_LOCATION = 26;
-    /** The width of the location bar next to our time table. */
-    public static final float WIDTH_LOCATION = 48;
- 
-    /** The height of a bar showing the movies at one specific location. */
-    public static final float HEIGHT_LOCATION = HEIGHT / LOCATIONS;
-    /** The width of a time slot. */
-    public static final float WIDTH_TIMESLOT = WIDTH / TIMESLOTS;
+        = "test.pdf";
+
     
-    protected BaseFont bf;
-    /**
-     * Main method.
-     * @param    args    no arguments needed
-     * @throws DocumentException 
-     * @throws IOException
-     */
+
     public static void main(String[] args)
         throws IOException, DocumentException {
-        new MyFirstTable().createPdf(RESULT);
+    	List<String> headers=new ArrayList<String>();
+    	headers.add("Nome");
+    
+    	List<List<String>> details=new ArrayList<List<String>>();
+    	List<String> riga1=new ArrayList<String>();
+    	riga1.add("test");
+      	List<String> riga2=new ArrayList<String>();
+    	riga1.add("alessio");
+    	List<String> riga=new ArrayList<String>();
+    	for(int i=0;i<100;i++)
+    	{
+    		riga=new ArrayList<String>();
+    		riga.add(i+"");
+    		details.add(riga);
+    	}
+    	details.add(riga1);
+    	details.add(riga2);
+    	String title="TEST TITLE";
+        new MyFirstTable().createPdf(RESULT,title,headers,details);
         
     }
  
-    /**
-     * Creates a PDF with information about the movies
-     * @param    filename the name of the PDF file that will be created.
-     * @throws    DocumentException 
-     * @throws    IOException
-     */
-    public void createPdf(String filename)
-        throws IOException, DocumentException {
-    	bf = BaseFont.createFont();
-    	Font f = new Font(bf, HEIGHT_LOCATION / 2);
-        f.setColor(BaseColor.WHITE);
 
-    	// step 1
+    public void createPdf(String filename,String title,List<String> headers,List<List<String>> details)
+        throws IOException, DocumentException {
         Document document = new Document();
-        // step 2
-        PdfWriter writer= PdfWriter.getInstance(document, new FileOutputStream(filename));
-        // step 3
         document.open();
         Paragraph p
-        = new Paragraph("TITOLO", new Font(FontFamily.HELVETICA, 22));
+        = new Paragraph(title, new Font(FontFamily.HELVETICA, 22));
         p.setAlignment(Element.ALIGN_CENTER);
         document.add(p);
         p.setSpacingAfter(10);
+        document.add(createTable(headers,details));
 
-        // step 4
-        document.add(createFirstTable());
-        
-
-
-        // step 5
         document.close();
     }
  
-    /**
-     * Creates our first table
-     * @return our first table
-     */
-    public static PdfPTable createFirstTable() {
-    	// a table with three columns
-        PdfPTable table = new PdfPTable(7);
-        // the cell object
-        PdfPCell cell;
-        // we add a cell with colspan 3
-      /*  cell = new PdfPCell(new Phrase("Cell with colspan 3"));
-        cell.setColspan(3);
-        table.addCell(cell);
-        // now we add a cell with rowspan 2
-        cell = new PdfPCell(new Phrase("Cell with rowspan 2"));
-        cell.setRowspan(2);
-        table.addCell(cell);
-        // we add the four remaining cells with addCell()
-        table.addCell("row 1; cell 1");
-        table.addCell("row 1; cell 2");
-        table.addCell("row 2; cell 1");
-        table.addCell("row 2; cell 2");*/
-        
-        
-        cell = new PdfPCell(new Phrase("A"));
-        table.addCell(cell);
-        cell = new PdfPCell(new Phrase("B"));
-        table.addCell(cell);
-        cell = new PdfPCell(new Phrase("C"));
-        table.addCell(cell);
-        cell = new PdfPCell(new Phrase("D"));
-        table.addCell(cell);
-        cell = new PdfPCell(new Phrase("E"));
-        table.addCell(cell);
-        cell = new PdfPCell(new Phrase("F"));
-        table.addCell(cell);
-        cell = new PdfPCell(new Phrase("G"));
-        table.addCell(cell);
-        table.setSpacingBefore(100);
-        return table;
-    }
-   
-    protected void drawInfo(PdfContentByte directcontent) {
-        directcontent.beginText();
 
-        directcontent.setFontAndSize(bf, 18);
-        directcontent.showTextAligned(Element.ALIGN_CENTER,
-            "FOOBAR FILM FESTIVAL", 10, 10, 0);
-
-        directcontent.endText();
+    
+    private PdfPTable createTable(List<String> headers,List<List<String>> details)
+    {
+    	PdfPTable table = new PdfPTable(headers.size());
+    	table.setSpacingBefore(100);
+    	setHeader(headers,table);
+    	setDetails(details, table);
+    	return table;
     }
+    
+    private void setHeader(List<String> headers,PdfPTable table){
+    	PdfPCell cell;
+    	for(String header:headers){
+      
+            cell = new PdfPCell(new Phrase(header));
+            table.addCell(cell);
+           
+           
+    	}
+    	
+    }
+    
+    
+    private void setDetails(List<List<String>> details,PdfPTable table)
+    {
+    	PdfPCell cell;
+    	for(List<String> riga:details)
+    	{
+    		for(String colonna:riga){
+    			cell = new PdfPCell(new Phrase(colonna));
+    	        table.addCell(cell);
+    		}
+    			
+    	}
+    }
+    
+    
+    
+    
 }
