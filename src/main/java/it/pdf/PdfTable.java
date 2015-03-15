@@ -5,8 +5,9 @@
  * This example only works with the AGPL version of iText.
  */
 
-package part1.chapter03;
+package it.pdf;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,9 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
  
-public class MyFirstTable {
+public class PdfTable {
  
     /** The resulting PDF file. */
     public static final String RESULT
@@ -49,7 +51,7 @@ public class MyFirstTable {
     	details.add(riga1);
     	details.add(riga2);
     	String title="TEST TITLE";
-        new MyFirstTable().createPdf(RESULT,title,headers,details);
+        new PdfTable().createPdf(RESULT,title,headers,details);
         
     }
  
@@ -57,6 +59,7 @@ public class MyFirstTable {
     public void createPdf(String filename,String title,List<String> headers,List<List<String>> details)
         throws IOException, DocumentException {
         Document document = new Document();
+        PdfWriter writer= PdfWriter.getInstance(document, new FileOutputStream(filename));
         document.open();
         Paragraph p
         = new Paragraph(title, new Font(FontFamily.HELVETICA, 22));
